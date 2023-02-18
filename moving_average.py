@@ -116,6 +116,4 @@ class MovingAverage(base_class.BaseClass):
         final_balance = self.moving_average(invested_capital, ma_1, ma_2, True)
         print(f"Using Moving Average with {ma_1=}  and {ma_2=} your current balance is:$ {final_balance=} ")
 
-        plt.style.use("default")
-
         return final_balance

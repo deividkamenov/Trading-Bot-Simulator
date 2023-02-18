@@ -81,6 +81,9 @@ class TradingApp:
             messagebox.showerror("Error", "Please enter a valid amount of test money")
             return
 
+        # Clear the previous plot
+        self.plot_area.clear()
+
         # Run the selected strategy and get the results
         if strategy == "Moving Average":
             moving_average_str = moving_average.MovingAverage(stock=stock, start_date=start_date, end_date=end_date)
@@ -107,20 +110,24 @@ class TradingApp:
             return
 
         # Display the results in the label
-        self.results_label.config(text=f"Final Account Value: {results[-1]:} $")
+        self.results_label.config(text=f"Final Account Value: {results} $")
 
         # Plot the results on the graph
-        time = np.arange(len(results))
+        time = np.arange(results.size)
         self.plot_area.plot(time, results)
+        # Redraw the canvas to display the updated graph
+        self.canvas.draw()
+        self.canvas_widget.draw()
+
+        # Set the x-axis label
+        self.plot_area.set_xlabel("Time")
+        self.plot_area.set_ylim([0, 175])
+
+        # Set the y-axis label
+        self.plot_area.set_ylabel("Account Value (USD)")
 
         # Redraw the canvas to display the updated graph
-        # self.canvas.draw()
-        # self.canvas.get_tk_widget().pack()
-
-        canvas = FigureCanvasTkAgg(plt, master=root)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
-
+        self.canvas_widget.draw()
 
 if __name__ == "__main__":
     root = tk.Tk()
