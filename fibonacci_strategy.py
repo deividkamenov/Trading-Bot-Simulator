@@ -1,10 +1,14 @@
 import base_class
 
 # fibonacci trading strategy with key values 23.6%, 38.2%, and 61.8% from the golden ratio of fibonacci
+# These levels are considered to be areas where the price may experience a change in direction,
+# as they represent potential levels of support or resistance.
 import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
+warnings.simplefilter("ignore")
 
 VALUE_1 = 0.236
 VALUE_2 = 0.382
@@ -21,6 +25,7 @@ class FibonacciStrategy:
                                       interval=self.interval)
         self.fib_levels = self.calculate_fibonacci_levels()
 
+    #calculate the fibonacci levels from the coefficients for the certain stock
     def calculate_fibonacci_levels(self):
         high_price = self.stock_data["High"].max()
         low_price = self.stock_data["Low"].min()
@@ -28,10 +33,12 @@ class FibonacciStrategy:
         fib_levels = [low_price + VALUE_1 * diff, low_price + VALUE_2 * diff, low_price + VALUE_3 * diff, high_price]
         return fib_levels
 
+
     def apply_trading_strategy(self):
         fib_levels = self.calculate_fibonacci_levels()
         trading_signal = 0
         position = 0
+        #loop through and check between which coefficients it is
         for i in range(1, len(self.stock_data)):
             prev_close = self.stock_data.iloc[i - 1]["Close"]
             open_price = self.stock_data.iloc[i]["Open"]
@@ -52,6 +59,7 @@ class FibonacciStrategy:
         returns = self.stock_data["Returns"]
         return returns
 
+    #plot the results
     def plot_stock_data(self):
         fig, ax = plt.subplots(figsize=(16, 8))
         ax.plot(self.stock_data.index, self.stock_data['Close'], label='Close Price')
@@ -67,7 +75,7 @@ class FibonacciStrategy:
 
 
 
-    # Simulate the startegy
+    # Simulate the startegy for a given capital
     def run_simulation(self, invested_capital):
         returns = self.apply_trading_strategy()
         cumulative_returns = invested_capital
@@ -78,5 +86,3 @@ class FibonacciStrategy:
             print(f"Using Fibonacci strategy on the {date} your current balance is {cumulative_returns}$")
 
         self.plot_stock_data()
-# fibonacci = FibonacciStrategy(start_date='2000-01-01', end_date='2023-02-16', stock='AAPL', interval='1d')
-# fibonacci.run_simulation_fubunacci()

@@ -1,3 +1,9 @@
+# RSI Relative strength index
+# The RSI is a technical indicator that measures the strength of price movements in a security over a
+# specified period of time.
+# It is calculated by comparing the average gains to the average losses over that period.
+# The strategy involves identifying potential buy and sell signals based on the RSI and a
+# 200-day simple moving average (SMA) of the stock's closing price.
 import base_class
 
 # rsi trading strategy
@@ -5,6 +11,9 @@ import yfinance as yf
 import pandas as pd
 import ta  # technical analysis
 import matplotlib.pyplot as plt
+import warnings
+warnings.simplefilter("ignore")
+
 
 SAM_DAYS = 200
 RSI_INDEX = 10
@@ -28,10 +37,11 @@ class RsiStrategy(base_class.BaseClass):
 
         self.data['price'] = self.data.Open.shift(-1)
 
-        # Set the date for buy when date close price i greater than SAM 200 days average & (bitwise and)  rsi < 30 day average
+        # Set the date for buy when date close price is greater than SAM 200 days average & (bitwise and)  rsi < 30 day average
         self.data['Buy'] = (self.data.Close > self.data.SMA) & (self.data.rsi < DAYS_AVERAGE)
         self.data['Sell'] = self.data.rsi > DAYS_AVERAGE + RSI_INDEX
 
+    # calculate the rsi function
     def calculate_rsi(self):
         self.adjust_data()
 
@@ -40,6 +50,7 @@ class RsiStrategy(base_class.BaseClass):
         sell_orders = []
         days_count = 0
 
+        # loow through the dataframe iterating over the rows
         for index, row in self.data.iterrows():
             if not right_position:
                 # Open long position
@@ -58,15 +69,17 @@ class RsiStrategy(base_class.BaseClass):
                     sell_orders.append(row.price)
                     right_position = False
 
+        # index the data
         trades = pd.DataFrame([buy_orders, sell_orders], index=['Buys', 'Sells'])
+        # transponse the dataframe
         trades = trades.T
 
+        # get the profit/loss
         trades['PnL'] = (trades.Sells - trades.Buys) / trades.Buys + 1
 
-        # returns = trades['PnL']
         return trades
 
-
+    # plot the rsi index
     def plot_rsi_index(self):
         self.adjust_data()
 
@@ -79,6 +92,7 @@ class RsiStrategy(base_class.BaseClass):
         plt.ylabel('RSI')
         plt.show()
 
+    # plot the money balance
     def plot_money_balance_rsi(self, money_made):
         # plot money made over time
         plt.plot(money_made)
@@ -87,7 +101,7 @@ class RsiStrategy(base_class.BaseClass):
         plt.ylabel("Amount")
         plt.show()
 
-
+    # runs a simulation with example capital and tests its results & plots
     def run_simulation(self, invested_capital):
         trades = self.calculate_rsi()
 

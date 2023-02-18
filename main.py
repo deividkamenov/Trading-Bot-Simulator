@@ -5,6 +5,10 @@ import fibonacci_strategy
 import top_companies_strategy
 import adx_strategy
 
+import warnings
+warnings.simplefilter("ignore")
+
+
 invested_capital = 1000
 stock = 'AAPL'
 start_date = '2000-01-01'
@@ -17,7 +21,7 @@ if __name__ == "__main__":
 
     #DONE
     moving_average_str = moving_average.MovingAverage(stock=stock, start_date=start_date, end_date=end_date)
-    # moving_average.find_best_average(min_ma1=10, min_ma2=0, max_ma1=201, max_ma2=201, step=10)
+    # moving_average_str.find_best_average(min_ma1=10, min_ma2=0, max_ma1=201, max_ma2=201, step=10)
     moving_average_str.run_simulation(invested_capital=invested_capital, ma_1=ma_1, ma_2=ma_2)
 
     # # DONE

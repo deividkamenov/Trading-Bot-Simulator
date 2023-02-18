@@ -1,5 +1,5 @@
-# momentum trading strategy top 50 most profitable companies for 12 months
-# being top 30 most profitable for 6mo being top 10 most profitabe for 3 mo
+# momentum strategy top 50 most profitable companies for 12 months
+# being top 30 most profitable for 6mo being top 10 most profitable for 3 mo
 # in NASDAQ100
 
 import base_class
@@ -8,12 +8,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
+import warnings
+warnings.simplefilter("ignore")
 
 
 class TopCompaniesStrategy(base_class.BaseClass):
     def __init__(self, start_date, end_date, interval='1d',
                  stocks_adress='https://en.wikipedia.org/wiki/Nasdaq-100'):
-
         super().__init__(start_date, end_date, interval)
         stocks_data = pd.read_html(stocks_adress)[4]
         self.stocks = stocks_data.Ticker.to_list()
@@ -26,7 +27,7 @@ class TopCompaniesStrategy(base_class.BaseClass):
         self.best_6_month = self.monthly_return.rolling(6).apply(np.prod)
         self.best_3_month = self.monthly_return.rolling(3).apply(np.prod)
 
-    # get the n highest companies of the highet performars
+    # get the n highest companies of the highest performers
     def get_best_companies(self, date):
         highest_50 = self.best_12_month.loc[date].nlargest(50).index  # top 50 in the year
         highest_30 = self.best_6_month.loc[date, highest_50].nlargest(
@@ -63,13 +64,10 @@ class TopCompaniesStrategy(base_class.BaseClass):
 
         plt.show()
 
-    #runs a simulation with a example value of invested capital
+    # runs a simulation with a example value of invested capital
     def run_simulation(self, invested_capital):
         # Simulate
         returns = self.momentum_strategy()
-
-        # for i, value in enumerate(returns.values):
-        #     print(f"In month {i + 1} you have made {invested_capital * value}$ with  ")
 
         for date, value in zip(returns.index, returns.values):
             print(f"Using momentum strategy on date {date.strftime('%Y-%m-%d')},"
