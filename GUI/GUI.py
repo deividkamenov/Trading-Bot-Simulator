@@ -34,16 +34,16 @@ class TradingApp:
         self.strategy1 = ttk.Radiobutton(master, text="Moving Average", variable=self.strategy, value="Moving Average")
         self.strategy1.pack()
 
-        self.strategy2 = ttk.Radiobutton(master, text="RSI", variable=self.strategy, value="RSI")
+        self.strategy2 = ttk.Radiobutton(master, text="RSI Strategy", variable=self.strategy, value="RSI Strategy")
         self.strategy2.pack()
 
-        self.strategy3 = ttk.Radiobutton(master, text="Strategy 3", variable=self.strategy, value="Strategy 3")
+        self.strategy3 = ttk.Radiobutton(master, text="Fibonacci Strategy", variable=self.strategy, value="Fibonacci Strategy")
         self.strategy3.pack()
 
-        self.strategy4 = ttk.Radiobutton(master, text="Strategy 4", variable=self.strategy, value="Strategy 4")
+        self.strategy4 = ttk.Radiobutton(master, text="ADX Strategy", variable=self.strategy, value="ADX Strategy")
         self.strategy4.pack()
 
-        self.strategy5 = ttk.Radiobutton(master, text="Strategy 5", variable=self.strategy, value="Strategy 5")
+        self.strategy5 = ttk.Radiobutton(master, text="Top Companies", variable=self.strategy, value="Top Companies")
         self.strategy5.pack()
 
         # Create the text box for inputting the test money
@@ -85,19 +85,26 @@ class TradingApp:
         if strategy == "Moving Average":
             moving_average_str = moving_average.MovingAverage(stock=stock, start_date=start_date, end_date=end_date)
             results = moving_average_str.run_simulation(invested_capital=invested_capital, ma_1=ma_1, ma_2=ma_2)
-        elif strategy == "RSI":
+
+        elif strategy == "RSI Strategy":
             rsi_str = rsi_strategy.RsiStrategy(stock=stock, start_date=start_date, end_date=end_date)
             results = rsi_str.run_simulation(invested_capital=invested_capital)
-        elif strategy == "Strategy 3":
-            results = Strategy3(test_money).run()
-        elif strategy == "Strategy 4":
-            results = Strategy4(test_money).run()
-        elif strategy == "Strategy 5":
-            results = Strategy5(test_money).run()
+
+        elif strategy == "Fibonacci Strategy":
+            fibonacci_str = fibonacci_strategy.FibonacciStrategy(stock=stock, start_date=start_date, end_date=end_date)
+            results = fibonacci_str.run_simulation(invested_capital=invested_capital)
+
+        elif strategy == "ADX Strategy":
+            atx_str = adx_strategy.ADXTradingStrategy(stock=stock, start_date=start_date, end_date=end_date)
+            results = atx_str.run_simulation(invested_capital)
+
+        elif strategy == "Top Companies":
+            top_companies_str = top_companies_strategy.TopCompaniesStrategy(start_date=start_date, end_date=end_date)
+            results = top_companies_str.run_simulation(invested_capital=invested_capital)
+
         else:
             messagebox.showerror("Error", "Please select a trading strategy")
             return
-        # results = 1000
 
         # Display the results in the label
         self.results_label.config(text=f"Final Account Value: {results[-1]:} $")
@@ -107,7 +114,13 @@ class TradingApp:
         self.plot_area.plot(time, results)
 
         # Redraw the canvas to display the updated graph
-        self.canvas.draw()
+        # self.canvas.draw()
+        # self.canvas.get_tk_widget().pack()
+
+        canvas = FigureCanvasTkAgg(plt, master=root)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+
 
 if __name__ == "__main__":
     root = tk.Tk()

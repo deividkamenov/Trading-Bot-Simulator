@@ -25,13 +25,13 @@ if __name__ == "__main__":
     rsi_str.run_simulation(invested_capital=invested_capital)
     # #
     # # # DONE
-    # fibonacci_str = fibonacci_strategy.FibonacciStrategy(stock=stock, start_date=start_date, end_date=end_date)
-    # fibonacci_str.run_simulation(invested_capital=invested_capital)
-
-    # # # DONE
-    # top_companies_str = top_companies_strategy.TopCompaniesStrategy(start_date=start_date, end_date=end_date)
-    # top_companies_str.run_simulation(invested_capital=invested_capital)
+    fibonacci_str = fibonacci_strategy.FibonacciStrategy(stock=stock, start_date=start_date, end_date=end_date)
+    fibonacci_str.run_simulation(invested_capital=invested_capital)
 
     # # # Done
-    # atx_str = adx_strategy.ADXTradingStrategy(stock=stock, start_date=start_date, end_date=end_date)
-    # atx_str.run_simulation(invested_capital)
+    atx_str = adx_strategy.ADXTradingStrategy(stock=stock, start_date=start_date, end_date=end_date)
+    atx_str.run_simulation(invested_capital)
+
+    # # # DONE
+    top_companies_str = top_companies_strategy.TopCompaniesStrategy(start_date=start_date, end_date=end_date)
+    top_companies_str.run_simulation(invested_capital=invested_capital)
