@@ -9,18 +9,29 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
 import warnings
+import sys
 warnings.simplefilter("ignore")
 
 
 class TopCompaniesStrategy(base_class.BaseClass):
     def __init__(self, start_date, end_date, interval='1d',
-                 stocks_adress='https://en.wikipedia.org/wiki/Nasdaq-100'):
+                 stocks_address='https://en.wikipedia.org/wiki/Nasdaq-100'):
         super().__init__(start_date, end_date, interval)
-        stocks_data = pd.read_html(stocks_adress)[4]
+        stocks_data = pd.read_html(stocks_address)[4]
         self.stocks = stocks_data.Ticker.to_list()
 
-        self.market_data = yf.download(self.stocks, start=start_date, end=end_date, interval=interval)['Adj Close']
-        self.monthly_return = (self.market_data.pct_change() + 1)[1:].resample('M').prod()
+        try:
+            self.market_data = yf.download(self.stocks, start=start_date, end=end_date, interval=interval)['Adj Close']
+            self.monthly_return = (self.market_data.pct_change() + 1)[1:].resample('M').prod()
+        except Exception as e:
+            print(f"Error downloading data: {e}")
+            sys.exit(-1)
+
+        if self.market_data is not None and self.market_data.empty:
+            print("No data downloaded, check your internet connection and if the data provided for the stock API (stock url address, dates, interval) is adequate")
+            sys.exit(-1)
+
+
 
         # get the best companies by highest montly return for the past n months
         self.best_12_month = self.monthly_return.rolling(12).apply(np.prod)
@@ -70,7 +81,7 @@ class TopCompaniesStrategy(base_class.BaseClass):
         returns = self.momentum_strategy()
 
         for date, value in zip(returns.index, returns.values):
-            print(f"Using momentum strategy on date {date.strftime('%Y-%m-%d')},"
-                  f" you have made {invested_capital * value}$ with  ")
+            print(f"Using Top Companies strategy on date {date.strftime('%Y-%m-%d')},"
+                  f" you have made {round(invested_capital * value, 2)}$")
 
         self.plot_simulation(invested_capital)

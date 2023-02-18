@@ -8,7 +8,7 @@ import pandas as pd
 import ta.trend as tr
 import warnings
 import matplotlib.pyplot as plt
-
+import sys
 warnings.simplefilter("ignore")
 
 
@@ -20,7 +20,19 @@ class ADXTradingStrategy(base_class.BaseClass):
         self.end_date = end_date
         self.interval = interval
         self.adx_strenght_percentage = adx_strenght_percentage
-        self.stock_data = yf.download(self.stock, self.start_date, self.end_date, self.interval)
+
+
+        # self.stock_data = yf.download(self.stock, self.start_date, self.end_date, self.interval)
+        try:
+            self.stock_data = yf.download(self.stock, self.start_date, self.end_date, self.interval)
+        except Exception as e:
+            print(f"Error downloading data: {e}")
+            sys.exit(-1)
+
+        if self.stock_data is not None and self.stock_data.empty:
+            print("No data downloaded, check your internet connection and if the data provided for the stock API (stock name, dates, interval) is adequate")
+            sys.exit(-1)
+
 
     def apply_atx_strategy(self):
         adx_indicator = tr.ADXIndicator(high=self.stock_data['High'], low=self.stock_data['Low'],
@@ -75,6 +87,6 @@ class ADXTradingStrategy(base_class.BaseClass):
             if not pd.isna(ret):  # check if the value is not NaN
                 cumulative_returns *= (1 + ret)  # multiply by (1 + return)
                 date = self.stock_data.index[i].date()
-                print(f"Using ATX strategy on the {date} your current balance is {cumulative_returns}$")
+                print(f"Using ATX strategy on the {date} your current balance is {round(cumulative_returns, 2)}$")
 
         self.plot_returns(invested_capital)

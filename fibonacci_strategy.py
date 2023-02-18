@@ -1,3 +1,5 @@
+import sys
+
 import base_class
 
 # fibonacci trading strategy with key values 23.6%, 38.2%, and 61.8% from the golden ratio of fibonacci
@@ -21,8 +23,18 @@ class FibonacciStrategy:
         self.start_date = start_date
         self.end_date = end_date
         self.interval = interval
-        self.stock_data = yf.download(tickers=self.stock, start=self.start_date, end=self.end_date,
-                                      interval=self.interval)
+        try:
+
+            self.stock_data = yf.download(tickers=self.stock, start=self.start_date, end=self.end_date,
+                                          interval=self.interval)
+        except Exception as e:
+            print(f"Error downloading data: {e}")
+            sys.exit(-1)
+
+        if self.stock_data is not None and self.stock_data.empty:
+            print("No data downloaded, check your internet connection and if the data provided for the stock API (stock name, dates, interval) is adequate")
+            sys.exit(-1)
+
         self.fib_levels = self.calculate_fibonacci_levels()
 
     #calculate the fibonacci levels from the coefficients for the certain stock
@@ -83,6 +95,6 @@ class FibonacciStrategy:
         for i, ret in enumerate(returns):
             cumulative_returns *= ret
             date = self.stock_data.index[i].date()
-            print(f"Using Fibonacci strategy on the {date} your current balance is {cumulative_returns}$")
+            print(f"Using Fibonacci strategy on the {date} your current balance is {round(cumulative_returns, 2)}$")
 
         self.plot_stock_data()

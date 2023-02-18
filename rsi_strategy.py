@@ -12,6 +12,7 @@ import pandas as pd
 import ta  # technical analysis
 import matplotlib.pyplot as plt
 import warnings
+import sys
 warnings.simplefilter("ignore")
 
 
@@ -27,7 +28,17 @@ class RsiStrategy(base_class.BaseClass):
         self.end_date = end_date
         self.stock = stock
         self.interval = interval
-        self.data = yf.download(self.stock, start=self.start_date, end=self.end_date, interval=interval)
+
+        # self.data = yf.download(self.stock, start=self.start_date, end=self.end_date, interval=interval)
+        try:
+            self.data = yf.download(self.stock, start=self.start_date, end=self.end_date, interval=interval)
+        except Exception as e:
+            print(f"Error downloading data: {e}")
+            sys.exit(-1)
+
+        if self.data is not None and self.data.empty:
+            print("No data downloaded, check your internet connection and if the data provided for the stock API (stock name, dates, interval) is adequate")
+            sys.exit(-1)
 
     def adjust_data(self):
         # Calulate 200 day average

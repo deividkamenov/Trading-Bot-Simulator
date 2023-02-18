@@ -12,6 +12,7 @@ import heapq
 import yfinance as yf
 import pandas as pd
 import warnings
+import sys
 
 warnings.simplefilter("ignore")
 
@@ -24,7 +25,15 @@ class MovingAverage(base_class.BaseClass):
         self.stock = stock
         self.interval = interval
 
-        self.data = yf.download(stock, start=self.start, end=self.end, interval=interval)
+        try:
+            self.data = yf.download(stock, start=self.start, end=self.end, interval=interval)
+        except Exception as e:
+            print(f"Error downloading data: {e}")
+            sys.exit(-1)
+
+        if self.data is not None and self.data.empty:
+            print("No data downloaded, check your internet connection and if the data provided for the stock API (stock name, dates, interval) is adequate")
+            sys.exit(-1)
 
     def plot_graph(self, buy_signals, sell_signals, ma_1, ma_2):
 
@@ -114,6 +123,6 @@ class MovingAverage(base_class.BaseClass):
     #Run a simulation with a single ma1 and ma2 and show the results
     def run_simulation(self, invested_capital, ma_1=20, ma_2=50):
         final_balance = self.moving_average(invested_capital, ma_1, ma_2, True)
-        print(f"Using Moving Average with {ma_1=}  and {ma_2=} your current balance is:$ {final_balance=} ")
+        print(f"Using Moving Average with {ma_1=}  and {ma_2=} your current balance is:$ {round(final_balance, 2)=} ")
 
         return final_balance
